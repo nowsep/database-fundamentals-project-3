@@ -1,0 +1,173 @@
+-- Task 2 - Create database BY AM
+DROP DATABASE IF EXISTS SCHOOL;
+
+CREATE DATABASE SCHOOL;
+
+USE SCHOOL;
+
+SHOW DATABASES;
+
+-- Task 3 - Create tables BY AM
+SHOW TABLES;
+
+CREATE TABLE TEACHER (
+  ID INT PRIMARY KEY,
+  NAME VARCHAR(50) NOT NULL,
+  EMAIL VARCHAR(50) UNIQUE NOT NULL,
+  PHONE VARCHAR(15) NOT NULL
+);
+
+CREATE TABLE CLASS (
+  ID INT PRIMARY KEY,
+  LEVEL INT NOT NULL,
+  COLOR VARCHAR(10) NOT NULL,
+  PHONE VARCHAR(15) NOT NULL,
+  TEACHER_ID INT NOT NULL,
+  FOREIGN KEY (TEACHER_ID) REFERENCES TEACHER(ID)
+);
+
+CREATE TABLE STUDENT (
+  ID INT PRIMARY KEY,
+  NAME VARCHAR(50) NOT NULL,
+  DOB DATE NOT NULL,
+  CLASS_ID INT NOT NULL,
+  FOREIGN KEY (CLASS_ID) REFERENCES CLASS(ID)
+);
+
+CREATE TABLE PARENT (
+  ID INT PRIMARY KEY,
+  NAME VARCHAR(50) NOT NULL,
+  EMAIL VARCHAR(50) UNIQUE NOT NULL,
+  HOME_PHONE VARCHAR(15) NOT NULL,
+  WORK_PHONE VARCHAR(15) NOT NULL
+);
+
+CREATE TABLE STUDENT_PARENT (
+  STUDENT_ID INT NOT NULL,
+  PARENT_ID INT NOT NULL,
+  PRIMARY KEY (STUDENT_ID, PARENT_ID),
+  FOREIGN KEY (STUDENT_ID) REFERENCES STUDENT(ID),
+  FOREIGN KEY (PARENT_ID) REFERENCES PARENT(ID)
+);
+
+SHOW TABLES;
+
+-- Show the structure of the created tables
+DESCRIBE TEACHER;
+DESCRIBE CLASS;
+DESCRIBE STUDENT;
+DESCRIBE PARENT;
+DESCRIBE STUDENT_PARENT;
+
+-- Task 4 - Add data BY AM
+SELECT * FROM TEACHER;
+SELECT * FROM CLASS;
+SELECT * FROM STUDENT;
+SELECT * FROM PARENT;
+SELECT * FROM STUDENT_PARENT;
+
+INSERT INTO TEACHER (ID, NAME, EMAIL, PHONE) VALUES
+(1, 'Alice Smith', 'alice.smith@school.edu', '555-1111'),
+(2, 'Bob Jones', 'bob.jones@school.edu', '555-2222'),
+(3, 'Charlie Brown', 'charlie.brown@school.edu', '555-3333'),
+(4, 'David Lee', 'david.lee@school.edu', '555-4444'),
+(5, 'Emma Watson', 'emma.watson@school.edu', '555-5555');
+
+INSERT INTO CLASS (ID, LEVEL, COLOR, PHONE, TEACHER_ID) VALUES
+(1, 1, 'Blue', '555-1001', 1),
+(2, 1, 'Green', '555-1002', 2),
+(3, 2, 'Red', '555-2001', 3),
+(4, 2, 'Yellow', '555-2002', 4),
+(5, 3, 'Purple', '555-3001', 5);
+
+INSERT INTO STUDENT (ID, NAME, DOB, CLASS_ID) VALUES
+(1, 'Anna Lee', '2020-01-01', 1),
+(2, 'Ben Smith', '2020-02-02', 1),
+(3, 'Cathy Jones', '2020-03-03', 2),
+(4, 'Dan Brown', '2020-04-04', 2),
+(5, 'Ella Green', '2020-05-05', 3),
+(6, 'Frank White', '2020-06-06', 3),
+(7, 'Grace Kim', '2020-07-07', 4),
+(8, 'Harry Potter', '2020-08-08', 4),
+(9, 'Ivy Chen', '2020-09-09', 5),
+(10, 'Jack Black', '2020-10-10', 5);
+
+INSERT INTO PARENT (ID, NAME, EMAIL, HOME_PHONE, WORK_PHONE) VALUES
+(1, 'Adam Lee', 'adam.lee@gmail.com', '555-6001', '555-7001'),
+(2, 'Beth Lee', 'beth.lee@gmail.com', '555-6001', '555-7002'),
+(3, 'Carl Smith', 'carl.smith@gmail.com', '555-6002', '555-7003'),
+(4, 'Dora Smith', 'dora.smith@gmail.com', '555-6002', '555-7004'),
+(5, 'Eric Jones', 'eric.jones@gmail.com', '555-6003', '555-7005'),
+(6, 'Fiona Jones', 'fiona.jones@gmail.com', '555-6003', '555-7006'),
+(7, 'Gary Brown', 'gary.brown@gmail.com', '555-6004', '555-7007'),
+(8, 'Helen Brown', 'helen.brown@gmail.com', '555-6004', '555-7008'),
+(9, 'Ian Green', 'ian.green@gmail.com', '555-6005', '555-7009'),
+(10, 'Jenny Green', 'jenny.green@gmail.com', '555-6005', '555-7010');
+
+INSERT INTO STUDENT_PARENT (STUDENT_ID, PARENT_ID) VALUES
+(1, 1), (1, 2), (2, 3), (2, 4), (3, 5), (3, 6), (4, 7), (4, 8), (5, 9), (5, 10),
+(6, 1), (6, 2), (7, 3), (7, 4), (8, 5), (8, 6), (9, 7), (9, 8), (10, 9), (10, 10);
+
+-- Show all the data in your table 
+SELECT * FROM TEACHER;
+SELECT * FROM CLASS;
+SELECT * FROM STUDENT;
+SELECT * FROM PARENT;
+SELECT * FROM STUDENT_PARENT;
+
+-- Task 5 - Query the data BY AM
+-- Question 1
+SELECT S.NAME AS STUDENT, 
+       CASE 
+         WHEN C.LEVEL = 1 THEN 'Turtles'
+         WHEN C.LEVEL = 2 THEN 'Foxes'
+         WHEN C.LEVEL = 3 THEN 'Monkeys'
+         ELSE 'Unknown'
+       END AS LEVEL,
+       C.COLOR AS COLOR, 
+       C.PHONE AS CLASS_PHONE, 
+       T.NAME AS TEACHER
+FROM STUDENT S
+JOIN CLASS C ON S.CLASS_ID = C.ID
+JOIN TEACHER T ON C.TEACHER_ID = T.ID
+ORDER BY S.NAME;
+
+-- Question 2
+SELECT CASE 
+         WHEN C.LEVEL = 1 THEN 'Turtles'
+         WHEN C.LEVEL = 2 THEN 'Foxes'
+         WHEN C.LEVEL = 3 THEN 'Monkeys'
+         ELSE 'Unknown'
+       END AS AGE_LEVEL,
+       C.COLOR AS COLOR, 
+       S.NAME AS STUDENT_NAME, 
+       S.DOB AS DOB
+FROM STUDENT S
+JOIN CLASS C ON S.CLASS_ID = C.ID
+ORDER BY AGE_LEVEL, C.COLOR, S.NAME;
+
+-- Question 3
+SELECT P.NAME AS PARENT, 
+       P.HOME_PHONE AS HOME_PHONE, 
+       S.NAME AS STUDENT, 
+       CASE 
+         WHEN C.LEVEL = 1 THEN 'Turtles'
+         WHEN C.LEVEL = 2 THEN 'Foxes'
+         WHEN C.LEVEL = 3 THEN 'Monkeys'
+         ELSE 'Unknown'
+       END AS AGE_LEVEL,
+       C.COLOR AS COLOR
+FROM PARENT P
+JOIN STUDENT_PARENT SP ON P.ID = SP.PARENT_ID
+JOIN STUDENT S ON SP.STUDENT_ID = S.ID
+JOIN CLASS C ON S.CLASS_ID = C.ID
+ORDER BY P.NAME, S.NAME;
+
+-- Question 4
+SELECT T.NAME AS TEACHER, P.NAME AS PARENT, S.NAME AS STUDENT
+FROM TEACHER T
+JOIN CLASS C ON T.ID = C.TEACHER_ID
+JOIN STUDENT S ON C.ID = S.CLASS_ID
+JOIN STUDENT_PARENT SP ON S.ID = SP.STUDENT_ID
+JOIN PARENT P ON SP.PARENT_ID = P.ID
+ORDER BY T.NAME, P.NAME, S.NAME;
